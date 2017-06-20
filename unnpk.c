@@ -67,6 +67,7 @@ static const struct map_entry part_types_names[] = {
 	{ NPK_PART_INSTALL, "Install script"},
 	{ NPK_PART_UNINSTALL, "Uninstall script"},
 	{ NPK_PART_PKG_ARCH, "Package architecture"},
+	{ NPK_PART_PKG_MAIN, "Main package information"},
 	{ 0, NULL},
 };
 
@@ -437,6 +438,41 @@ static int proc_part_data_pkg_arch(uint8_t *data, const uint32_t size,
 }
 
 /**
+ * Processes NPK file partition as package info, returns zero on success
+ * arguments:
+ *   * data - Partition data pointer
+ *   * size - Partition data size
+ *   * opt - Processing options
+ */
+static int proc_part_data_pkg_info(uint8_t *data, const uint32_t size,
+				   const struct options *opt)
+{
+	struct npk_part_pkg_info_hdr *hdr = (void *)data;
+	char buf[0x80];
+	unsigned len;
+	struct tm tm;
+
+	if ((opt->flags & FL_DUMP) == 0)
+		return 0;
+
+	len = sizeof(hdr->name) <= sizeof(buf) - 1 ? sizeof(hdr->name) + 1 : sizeof(buf);
+	buf[len - 1] = '\0';
+	printf("Name      : %s\n", strncpy(buf, hdr->name, len - 1));
+	printf("Unknown   : %s\n", array2str(hdr->unk_20, sizeof(hdr->unk_20)));
+	if (hdr->revision)
+		printf("Version   : %u.%u.%u\n", hdr->ver_maj, hdr->ver_min,
+		       hdr->revision);
+	else
+		printf("Version   : %u.%u\n", hdr->ver_maj, hdr->ver_min);
+	gmtime_r((time_t *)&hdr->timestamp, &tm);
+	strftime(buf, sizeof(buf), "%c", &tm);
+	printf("Timestamp : %u (%s)\n", hdr->timestamp, buf);
+	printf("Unknown   : %s\n", array2str(hdr->unk_30, sizeof(hdr->unk_30)));
+
+	return 0;
+}
+
+/**
  * Processes NPK file partition content, returns zero on success
  * arguments:
  *   * type - Partition type
@@ -456,6 +492,8 @@ static int proc_part_data(const uint16_t type, const uint32_t size, uint8_t *dat
 		return proc_part_data_files(data, size, opt);
 	case NPK_PART_PKG_ARCH:
 		return proc_part_data_pkg_arch(data, size, opt);
+	case NPK_PART_PKG_MAIN:
+		return proc_part_data_pkg_info(data, size, opt);
 	}
 	return 0;
 }
@@ -463,25 +501,9 @@ static int proc_part_data(const uint16_t type, const uint32_t size, uint8_t *dat
 /* Print main NPK file header */
 static void proc_main_print_main_hdr(const struct npk_main_hdr *hdr)
 {
-	char buf[0x80];
-	unsigned len;
-	struct tm tm;
-
 	printf("\n[Main header]\n");
 	printf("Signature : %s\n", array2str((uint8_t *)&hdr->sign, sizeof(hdr->sign)));
 	printf("Remain siz: %u\n", hdr->remain_sz);
-	printf("Unknown   : %s\n", array2str(hdr->unk_10, sizeof(hdr->unk_10)));
-	len = sizeof(hdr->name) <= sizeof(buf) - 1 ? sizeof(hdr->name) + 1 : sizeof(buf);
-	buf[len - 1] = '\0';
-	printf("Name      : %s\n", strncpy(buf, hdr->name, len - 1));
-	printf("Revision  : %u\n", hdr->revision);
-	printf("Unknown   : %s\n", array2str(hdr->unk_20, sizeof(hdr->unk_20)));
-	printf("Vers minor: %u\n", hdr->ver_min);
-	printf("Vers major: %u\n", hdr->ver_maj);
-	gmtime_r((time_t *)&hdr->timestamp, &tm);
-	strftime(buf, sizeof(buf), "%c", &tm);
-	printf("Timestamp : %u (%s)\n", hdr->timestamp, buf);
-	printf("Unknown   : %s\n", array2str(hdr->unk_30, sizeof(hdr->unk_30)));
 }
 
 /* Print NPK file partition header */

@@ -29,21 +29,10 @@
 /* NPK file signature */
 #define NPK_SIGNATURE	0x1EF1D0BA
 
-/* Length of name field of main NPK header */
-#define NPK_MAIN_HDR_NAME_LEN	16
-
 /* Main NPK file header */
 struct npk_main_hdr {
 	uint32_t sign;				/* File magic signature */
 	uint32_t remain_sz;			/* Remain file size */
-	uint8_t unk_10[6];			/* Unknown field */
-	char name[NPK_MAIN_HDR_NAME_LEN];	/* NPK name */
-	uint8_t revision;			/* Revision */
-	uint8_t unk_20[1];			/* Unknown field */
-	uint8_t ver_min;			/* Version minor */
-	uint8_t ver_maj;			/* Version major */
-	uint32_t timestamp;			/* Timestamp */
-	uint8_t unk_30[8];			/* Unknown field */
 } __attribute__((packed));
 
 /* NPK partition types */
@@ -52,11 +41,26 @@ struct npk_main_hdr {
 #define NPK_PART_INSTALL	0x07	/* Install script */
 #define NPK_PART_UNINSTALL	0x08	/* Uninstall script */
 #define NPK_PART_PKG_ARCH	0x10	/* Package architecture (e.g. i386) */
+#define NPK_PART_PKG_MAIN	0x12	/* Main package info: name, version, etc. */
 
 /* NPK partition header */
 struct npk_part_hdr {
 	uint16_t type;			/* Partition type (see above) */
 	uint32_t size;			/* Partition size */
+} __attribute__((packed));
+
+/* Length of package name field */
+#define NPK_PKG_NAME_LEN	16
+
+/* NPK package main info */
+struct npk_part_pkg_info_hdr {
+	char name[NPK_PKG_NAME_LEN];	/* Package name */
+	uint8_t revision;		/* Revision */
+	uint8_t unk_20[1];		/* Unknown field */
+	uint8_t ver_min;		/* Version minor */
+	uint8_t ver_maj;		/* Version major */
+	uint32_t timestamp;		/* Timestamp */
+	uint8_t unk_30[8];		/* Unknown field */
 } __attribute__((packed));
 
 #define NPK_FILE_PERM_EXEC	237	/* Executable */
