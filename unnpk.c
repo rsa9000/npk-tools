@@ -69,6 +69,7 @@ static const struct map_entry part_types_names[] = {
 	{ NPK_PART_UNINSTALL, "Uninstall script"},
 	{ NPK_PART_PKG_ARCH, "Package architecture"},
 	{ NPK_PART_PKG_MAIN, "Main package information"},
+	{ NPK_PART_SQUASHFS, "Squash filesystem image"},
 	{ NPK_PART_DIGEST, "Digest"},
 	{ NPK_PART_RELTYPE, "Release type"},
 	{ 0, NULL},
@@ -485,6 +486,62 @@ static int proc_part_data_pkg_info(uint8_t *data, const uint32_t size,
 }
 
 /**
+ * Processes NPK file partition as SquashFS image, returns zero on success
+ * arguments:
+ *   * data - Partition data pointer
+ *   * size - Partition data size
+ *   * opt - Processing options
+ */
+static int proc_part_data_squashfs(uint8_t *data, const uint32_t size,
+				   const struct options *opt)
+{
+	char *imgname;
+	size_t namelen;
+	FILE *fp;
+	size_t wres;
+
+	if (opt->flags & FL_DUMP) {
+		/* Do nothing */
+	} else if (opt->flags & FL_LIST) {
+		printf("%s.squashfs\n", pkg_name);
+	}
+
+	if (OP_EXTRACT != opt->op)
+		return 0;
+
+	/* Name: <pkg_name> + '.squashfs' + '\0' */
+	namelen = strlen(pkg_name) + 10;
+	imgname = malloc(namelen);
+	if (!imgname) {
+		perror("malloc");
+		return -ENOMEM;
+	}
+	snprintf(imgname, namelen, "%s.squashfs", pkg_name);
+
+	fp = fopen(imgname, "wb");
+	if (!fp) {
+		fprintf(stderr, "Error: could not open '%s' for writing: %s\n",
+			imgname, strerror(errno));
+		free(imgname);
+		return -errno;
+	}
+
+	wres = fwrite(data, 1, size, fp);
+	if (wres != size) {
+		fprintf(stderr, "Error: could not write SquashFS data to '%s': %s\n",
+			imgname, strerror(errno));
+		free(imgname);
+		fclose(fp);
+		return -errno;
+	}
+
+	fclose(fp);
+	free(imgname);
+
+	return 0;
+}
+
+/**
  * Processes NPK file partition as digest, returns zero on success
  * arguments:
  *   * data - Partition data pointer
@@ -543,6 +600,8 @@ static int proc_part_data(const uint16_t type, const uint32_t size, uint8_t *dat
 	case NPK_PART_PKG_INFO:
 	case NPK_PART_PKG_MAIN:
 		return proc_part_data_pkg_info(data, size, opt);
+	case NPK_PART_SQUASHFS:
+		return proc_part_data_squashfs(data, size, opt);
 	case NPK_PART_DIGEST:
 		return proc_part_data_digest(data, size, opt);
 	case NPK_PART_RELTYPE:
