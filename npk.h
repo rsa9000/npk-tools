@@ -43,9 +43,7 @@ struct npk_main_hdr {
 	uint8_t ver_min;			/* Version minor */
 	uint8_t ver_maj;			/* Version major */
 	uint32_t timestamp;			/* Timestamp */
-	uint8_t unk_30[10];			/* Unknown field */
-	uint8_t unk_40[4];			/* Unknown field */
-	char arch[4];				/* Arch string */
+	uint8_t unk_30[8];			/* Unknown field */
 } __attribute__((packed));
 
 /* NPK partition types */
@@ -53,6 +51,7 @@ struct npk_main_hdr {
 #define NPK_PART_FILES		0x04	/* Files container */
 #define NPK_PART_INSTALL	0x07	/* Install script */
 #define NPK_PART_UNINSTALL	0x08	/* Uninstall script */
+#define NPK_PART_PKG_ARCH	0x10	/* Package architecture (e.g. i386) */
 
 /* NPK partition header */
 struct npk_part_hdr {

@@ -66,6 +66,7 @@ static const struct map_entry part_types_names[] = {
 	{ NPK_PART_FILES, "Files container"},
 	{ NPK_PART_INSTALL, "Install script"},
 	{ NPK_PART_UNINSTALL, "Uninstall script"},
+	{ NPK_PART_PKG_ARCH, "Package architecture"},
 	{ 0, NULL},
 };
 
@@ -418,6 +419,24 @@ static int proc_part_data_script(const uint8_t *data, const uint32_t size, const
 }
 
 /**
+ * Processes NPK file partition as package architecture, returns zero on success
+ * arguments:
+ *   * data - Partition data pointer
+ *   * size - Partition data size
+ *   * opt - Processing options
+ */
+static int proc_part_data_pkg_arch(uint8_t *data, const uint32_t size,
+				   const struct options *opt)
+{
+	if ((opt->flags & FL_DUMP) == 0)
+		return 0;
+
+	printf("Arch: %.*s\n", size, data);
+
+	return 0;
+}
+
+/**
  * Processes NPK file partition content, returns zero on success
  * arguments:
  *   * type - Partition type
@@ -435,6 +454,8 @@ static int proc_part_data(const uint16_t type, const uint32_t size, uint8_t *dat
 		return proc_part_data_script(data, size, opt);
 	case NPK_PART_FILES:
 		return proc_part_data_files(data, size, opt);
+	case NPK_PART_PKG_ARCH:
+		return proc_part_data_pkg_arch(data, size, opt);
 	}
 	return 0;
 }
@@ -461,10 +482,6 @@ static void proc_main_print_main_hdr(const struct npk_main_hdr *hdr)
 	strftime(buf, sizeof(buf), "%c", &tm);
 	printf("Timestamp : %u (%s)\n", hdr->timestamp, buf);
 	printf("Unknown   : %s\n", array2str(hdr->unk_30, sizeof(hdr->unk_30)));
-	printf("Unknown   : %s\n", array2str(hdr->unk_40, sizeof(hdr->unk_40)));
-	len = sizeof(hdr->arch) <= sizeof(buf) - 1 ? sizeof(hdr->arch) + 1 : sizeof(buf);
-	buf[len - 1] = '\0';
-	printf("Arch      : %s\n", strncpy(buf, hdr->arch, len - 1));
 }
 
 /* Print NPK file partition header */
