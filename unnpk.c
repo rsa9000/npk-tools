@@ -62,6 +62,7 @@ struct map_entry {
 /* List of NPK partition types names */
 static const struct map_entry part_types_names[] = {
 	{ 0, "Unknown"},
+	{ NPK_PART_PKG_INFO, "Package information"},
 	{ NPK_PART_PKG_DESC, "Package description"},
 	{ NPK_PART_FILES, "Files container"},
 	{ NPK_PART_INSTALL, "Install script"},
@@ -530,6 +531,7 @@ static int proc_part_data(const uint16_t type, const uint32_t size, uint8_t *dat
 		return proc_part_data_files(data, size, opt);
 	case NPK_PART_PKG_ARCH:
 		return proc_part_data_pkg_arch(data, size, opt);
+	case NPK_PART_PKG_INFO:
 	case NPK_PART_PKG_MAIN:
 		return proc_part_data_pkg_info(data, size, opt);
 	case NPK_PART_DIGEST:

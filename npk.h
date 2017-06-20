@@ -36,6 +36,7 @@ struct npk_main_hdr {
 } __attribute__((packed));
 
 /* NPK partition types */
+#define NPK_PART_PKG_INFO	0x01	/* Package information: name, ver, etc. */
 #define NPK_PART_PKG_DESC	0x02	/* Package description */
 #define NPK_PART_FILES		0x04	/* Files container */
 #define NPK_PART_INSTALL	0x07	/* Install script */
