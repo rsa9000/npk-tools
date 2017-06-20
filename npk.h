@@ -42,6 +42,7 @@ struct npk_main_hdr {
 #define NPK_PART_UNINSTALL	0x08	/* Uninstall script */
 #define NPK_PART_PKG_ARCH	0x10	/* Package architecture (e.g. i386) */
 #define NPK_PART_PKG_MAIN	0x12	/* Main package info: name, version, etc. */
+#define NPK_PART_RELTYPE	0x18	/* Release type (e.g. stable, bugfix) */
 
 /* NPK partition header */
 struct npk_part_hdr {

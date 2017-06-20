@@ -68,6 +68,7 @@ static const struct map_entry part_types_names[] = {
 	{ NPK_PART_UNINSTALL, "Uninstall script"},
 	{ NPK_PART_PKG_ARCH, "Package architecture"},
 	{ NPK_PART_PKG_MAIN, "Main package information"},
+	{ NPK_PART_RELTYPE, "Release type"},
 	{ 0, NULL},
 };
 
@@ -473,6 +474,24 @@ static int proc_part_data_pkg_info(uint8_t *data, const uint32_t size,
 }
 
 /**
+ * Processes NPK file partition as release type, returns zero on success
+ * arguments:
+ *   * data - Partition data pointer
+ *   * size - Partition data size
+ *   * opt - Processing options
+ */
+static int proc_part_data_reltype(uint8_t *data, const uint32_t size,
+				  const struct options *opt)
+{
+	if ((opt->flags & FL_DUMP) == 0)
+		return 0;
+
+	printf("Rel. type: %.*s\n", size, data);
+
+	return 0;
+}
+
+/**
  * Processes NPK file partition content, returns zero on success
  * arguments:
  *   * type - Partition type
@@ -494,6 +513,8 @@ static int proc_part_data(const uint16_t type, const uint32_t size, uint8_t *dat
 		return proc_part_data_pkg_arch(data, size, opt);
 	case NPK_PART_PKG_MAIN:
 		return proc_part_data_pkg_info(data, size, opt);
+	case NPK_PART_RELTYPE:
+		return proc_part_data_reltype(data, size, opt);
 	}
 	return 0;
 }
