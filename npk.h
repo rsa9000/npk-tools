@@ -42,7 +42,7 @@ struct npk_main_hdr {
 	uint8_t unk_20[1];			/* Unknown field */
 	uint8_t ver_min;			/* Version minor */
 	uint8_t ver_maj;			/* Version major */
-	uint8_t ver_2[4];			/* Version 2 */
+	uint32_t timestamp;			/* Timestamp */
 	uint8_t unk_30[10];			/* Unknown field */
 	uint8_t unk_40[4];			/* Unknown field */
 	char arch[4];				/* Arch string */

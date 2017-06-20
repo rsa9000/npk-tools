@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+#include <time.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <errno.h>
@@ -406,6 +407,7 @@ static void proc_main_print_main_hdr(const struct npk_main_hdr *hdr)
 {
 	char buf[0x80];
 	unsigned len;
+	struct tm tm;
 
 	printf("\n[Main header]\n");
 	printf("Signature : %s\n", array2str((uint8_t *)&hdr->sign, sizeof(hdr->sign)));
@@ -418,7 +420,9 @@ static void proc_main_print_main_hdr(const struct npk_main_hdr *hdr)
 	printf("Unknown   : %s\n", array2str(hdr->unk_20, sizeof(hdr->unk_20)));
 	printf("Vers minor: %u\n", hdr->ver_min);
 	printf("Vers major: %u\n", hdr->ver_maj);
-	printf("Version 2 : %s\n", array2str(hdr->ver_2, sizeof(hdr->ver_2)));
+	gmtime_r((time_t *)&hdr->timestamp, &tm);
+	strftime(buf, sizeof(buf), "%c", &tm);
+	printf("Timestamp : %u (%s)\n", hdr->timestamp, buf);
 	printf("Unknown   : %s\n", array2str(hdr->unk_30, sizeof(hdr->unk_30)));
 	printf("Unknown   : %s\n", array2str(hdr->unk_40, sizeof(hdr->unk_40)));
 	len = sizeof(hdr->arch) <= sizeof(buf) - 1 ? sizeof(hdr->arch) + 1 : sizeof(buf);
