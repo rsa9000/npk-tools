@@ -438,15 +438,6 @@ static void proc_main_print_description(const char *str, const unsigned len)
 	printf("\n[Description]\n%.*s\n", len, str);
 }
 
-/* Print submain NPK file header */
-static void proc_main_print_submain_hdr(const struct npk_submain_hdr *hdr)
-{
-	printf("\n[Submain header]\n");
-	printf("Unknown: %s\n", array2str(hdr->unk_10, sizeof(hdr->unk_10)));
-	printf("Unknown: %s\n", array2str(hdr->unk_20, sizeof(hdr->unk_20)));
-	printf("Unknown: %s\n", array2str(hdr->unk_30, sizeof(hdr->unk_30)));
-}
-
 /* Print NPK file partition header */
 static void proc_main_print_part_hdr(const struct npk_part_hdr *hdr)
 {
@@ -493,14 +484,6 @@ static int proc_main(uint8_t *base, const struct options *opt)
 	} else if (opt->flags & FL_DUMP)
 		proc_main_print_description((char *)ptr, mhdr->descr_len);
 	ptr += mhdr->descr_len;
-
-	/* Process submain header */
-	if (REMAIN < sizeof(struct npk_submain_hdr)) {
-		fprintf(stderr, "Error: remain file chunk not enough for mandatory submain header.\n");
-		return -EINVAL;
-	} else if (opt->flags & FL_DUMP)
-		proc_main_print_submain_hdr((struct npk_submain_hdr *)ptr);
-	ptr += sizeof(struct npk_submain_hdr);
 
 	/* Process file partitions */
 	while (REMAIN != 0) {

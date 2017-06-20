@@ -50,13 +50,6 @@ struct npk_main_hdr {
 	uint32_t descr_len;			/* Description size */
 } __attribute__((packed));
 
-/* Submain NPK file header */
-struct npk_submain_hdr {
-	uint8_t unk_10[24];		/* Unknown field */
-	uint8_t unk_20[8];		/* Unknown field */
-	uint8_t unk_30[8];		/* Unknown field */
-} __attribute__((packed));
-
 /* NPK partition types */
 #define NPK_PART_TYPE_FILES	4	/* Files container */
 #define NPK_PART_TYPE_INSTALL	7	/* Install script */
