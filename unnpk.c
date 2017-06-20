@@ -91,6 +91,8 @@ static const struct map_entry file_types_names[] = {
 	{ 0, NULL},
 };
 
+static char *pkg_name;		/* The current processing package name */
+
 /**
  * Performs type to name mapping and returns name string
  * arguments:
@@ -455,12 +457,19 @@ static int proc_part_data_pkg_info(uint8_t *data, const uint32_t size,
 	unsigned len;
 	struct tm tm;
 
+	len = strnlen(hdr->name, sizeof(hdr->name)) + 1;
+	pkg_name = realloc(pkg_name, len);
+	if (!pkg_name) {
+		perror("realloc");
+		return -ENOMEM;
+	}
+	memcpy(pkg_name, hdr->name, len - 1);
+	pkg_name[len - 1] = '\0';
+
 	if ((opt->flags & FL_DUMP) == 0)
 		return 0;
 
-	len = sizeof(hdr->name) <= sizeof(buf) - 1 ? sizeof(hdr->name) + 1 : sizeof(buf);
-	buf[len - 1] = '\0';
-	printf("Name      : %s\n", strncpy(buf, hdr->name, len - 1));
+	printf("Name      : %s\n", pkg_name);
 	printf("Unknown   : %s\n", array2str(hdr->unk_20, sizeof(hdr->unk_20)));
 	if (hdr->revision)
 		printf("Version   : %u.%u.%u\n", hdr->ver_maj, hdr->ver_min,
@@ -800,6 +809,8 @@ int main(const int argc, const char *argv[])
 			return 1;
 		}
 	}
+
+	pkg_name = strdup("unknown-pkg");
 
 	ret = proc_main(base, &opt);
 
