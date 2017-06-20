@@ -1,7 +1,7 @@
 /**
  * Mikrotik's NPK file structures definitions
  *
- * Copyright (c) 2012, Sergey Ryazanov <ryazanov.s.a@gmail.com>
+ * Copyright (c) 2012-2017, Sergey Ryazanov <ryazanov.s.a@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
