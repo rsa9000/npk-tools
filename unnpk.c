@@ -62,6 +62,7 @@ struct map_entry {
 /* List of NPK partition types names */
 static const struct map_entry part_types_names[] = {
 	{ 0, "Unknown"},
+	{ NPK_PART_PKG_DESC, "Package description"},
 	{ NPK_PART_FILES, "Files container"},
 	{ NPK_PART_INSTALL, "Install script"},
 	{ NPK_PART_UNINSTALL, "Uninstall script"},
@@ -179,6 +180,40 @@ static void create_file_path(char *path)
 		create_path(path);
 		*p = '/';
 	}
+}
+
+/**
+ * Processes NPK file partition as package description, returns zero on success
+ * arguments:
+ *   * data - Partition data pointer
+ *   * size - Partition data size
+ *   * opt - Processing options
+ */
+static int proc_part_data_pkg_desc(uint8_t *data, const uint32_t size,
+				   const struct options *opt)
+{
+	char buf[size + 1], *p, *e;
+	size_t len = strnlen((char *)data, size);
+
+	if ((opt->flags & FL_DUMP) == 0)
+		return 0;
+
+	strncpy(buf, (char *)data, len);
+	buf[len] = '\0';
+
+	p = buf;
+	e = buf + len - 1;
+
+	/* Remove leading newlines and spaces */
+	while (*p == '\n' || *p == ' ')
+		p++;
+	/* Remove trailing newlines and spaces */
+	while (*e == '\n' || *e == ' ')
+		e--;
+
+	printf("Description: %.*s\n", e - p + 1, p);
+
+	return 0;
 }
 
 /**
@@ -393,6 +428,8 @@ static int proc_part_data_script(const uint8_t *data, const uint32_t size, const
 static int proc_part_data(const uint16_t type, const uint32_t size, uint8_t *data, const struct options *opt)
 {
 	switch (type) {
+	case NPK_PART_PKG_DESC:
+		return proc_part_data_pkg_desc(data, size, opt);
 	case NPK_PART_INSTALL:
 	case NPK_PART_UNINSTALL:
 		return proc_part_data_script(data, size, opt);
@@ -428,14 +465,6 @@ static void proc_main_print_main_hdr(const struct npk_main_hdr *hdr)
 	len = sizeof(hdr->arch) <= sizeof(buf) - 1 ? sizeof(hdr->arch) + 1 : sizeof(buf);
 	buf[len - 1] = '\0';
 	printf("Arch      : %s\n", strncpy(buf, hdr->arch, len - 1));
-	printf("Unknown   : %s\n", array2str(hdr->unk_50, sizeof(hdr->unk_50)));
-	printf("Descr len : %u\n", hdr->descr_len);
-}
-
-/* Print NPK file description */
-static void proc_main_print_description(const char *str, const unsigned len)
-{
-	printf("\n[Description]\n%.*s\n", len, str);
 }
 
 /* Print NPK file partition header */
@@ -476,14 +505,6 @@ static int proc_main(uint8_t *base, const struct options *opt)
 	if (opt->flags & FL_DUMP)
 		proc_main_print_main_hdr(mhdr);
 	ptr += sizeof(struct npk_main_hdr);
-
-	/* Process description */
-	if (REMAIN < mhdr->descr_len) {
-		fprintf(stderr, "Error: specified file description greater than actual remain file chunk.\n");
-		return -EINVAL;
-	} else if (opt->flags & FL_DUMP)
-		proc_main_print_description((char *)ptr, mhdr->descr_len);
-	ptr += mhdr->descr_len;
 
 	/* Process file partitions */
 	while (REMAIN != 0) {

@@ -46,11 +46,10 @@ struct npk_main_hdr {
 	uint8_t unk_30[10];			/* Unknown field */
 	uint8_t unk_40[4];			/* Unknown field */
 	char arch[4];				/* Arch string */
-	uint8_t unk_50[2];			/* Unknown field */
-	uint32_t descr_len;			/* Description size */
 } __attribute__((packed));
 
 /* NPK partition types */
+#define NPK_PART_PKG_DESC	0x02	/* Package description */
 #define NPK_PART_FILES		0x04	/* Files container */
 #define NPK_PART_INSTALL	0x07	/* Install script */
 #define NPK_PART_UNINSTALL	0x08	/* Uninstall script */
