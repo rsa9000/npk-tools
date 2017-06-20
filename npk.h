@@ -51,9 +51,9 @@ struct npk_main_hdr {
 } __attribute__((packed));
 
 /* NPK partition types */
-#define NPK_PART_TYPE_FILES	4	/* Files container */
-#define NPK_PART_TYPE_INSTALL	7	/* Install script */
-#define NPK_PART_TYPE_UNINSTALL	8	/* Uninstall script */
+#define NPK_PART_FILES		4	/* Files container */
+#define NPK_PART_INSTALL	7	/* Install script */
+#define NPK_PART_UNINSTALL	8	/* Uninstall script */
 
 /* NPK partition header */
 struct npk_part_hdr {

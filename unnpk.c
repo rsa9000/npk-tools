@@ -62,9 +62,9 @@ struct map_entry {
 /* List of NPK partition types names */
 static const struct map_entry part_types_names[] = {
 	{ 0, "Unknown"},
-	{ NPK_PART_TYPE_FILES, "Files container"},
-	{ NPK_PART_TYPE_INSTALL, "Install script"},
-	{ NPK_PART_TYPE_UNINSTALL, "Uninstall script"},
+	{ NPK_PART_FILES, "Files container"},
+	{ NPK_PART_INSTALL, "Install script"},
+	{ NPK_PART_UNINSTALL, "Uninstall script"},
 	{ 0, NULL},
 };
 
@@ -393,10 +393,10 @@ static int proc_part_data_script(const uint8_t *data, const uint32_t size, const
 static int proc_part_data(const uint16_t type, const uint32_t size, uint8_t *data, const struct options *opt)
 {
 	switch (type) {
-	case NPK_PART_TYPE_INSTALL:
-	case NPK_PART_TYPE_UNINSTALL:
+	case NPK_PART_INSTALL:
+	case NPK_PART_UNINSTALL:
 		return proc_part_data_script(data, size, opt);
-	case NPK_PART_TYPE_FILES:
+	case NPK_PART_FILES:
 		return proc_part_data_files(data, size, opt);
 	}
 	return 0;
