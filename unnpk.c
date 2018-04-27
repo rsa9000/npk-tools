@@ -219,7 +219,7 @@ static int proc_part_data_pkg_desc(uint8_t *data, const uint32_t size,
 	while (*e == '\n' || *e == ' ')
 		e--;
 
-	printf("Description: %.*s\n", e - p + 1, p);
+	printf("Description: %.*s\n", (int)(e - p + 1), p);
 
 	return 0;
 }
