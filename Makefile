@@ -8,7 +8,7 @@ LDFLAGS += -lz
 all: $(TARGET)
 
 $(TARGET): unnpk.c
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $<
+	$(CC) $(CFLAGS) $< $(LDFLAGS) -o $@
 
 clean:
 	rm -f $(TARGET)
