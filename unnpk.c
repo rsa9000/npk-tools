@@ -1,7 +1,7 @@
 /**
  * Mikrotik's NPK package processor/unpacker
  *
- * Copyright (c) 2012-2017, Sergey Ryazanov <ryazanov.s.a@gmail.com>
+ * Copyright (c) 2012-2018, Sergey Ryazanov <ryazanov.s.a@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -33,7 +33,7 @@
 
 #include "npk.h"
 
-#define VERSION_STR	"1.1"
+#define VERSION_STR	"1.1.1"
 
 #define FL_DUMP		0x01	/* Dump internal NPK structures flag */
 #define FL_LIST		0x02	/* List NPK files */
